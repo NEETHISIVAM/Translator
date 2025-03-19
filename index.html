@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Translation Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #4A90E2;
+            text-align: center;
+        }
+        .chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            max-height: 60vh;
+            border: 1px solid #ccc;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            justify-content: space-between;
+        }
+        .source-text, .translated-text {
+            background-color: #f1f1f1;
+            color: #333;
+            padding: 12px;
+            border-radius: 20px;
+            max-width: 45%;
+        }
+        .source-text {
+            background-color: #4A90E2;
+            color: white;
+        }
+        .translated-text {
+            background-color: #28A745;
+            color: white;
+        }
+        input, select, button {
+            margin: 10px 0;
+            padding: 12px;
+            font-size: 16px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        input, select {
+            background-color: #f1f1f1;
+        }
+        button {
+            background-color: #4A90E2;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #357ABD;
+        }
+    </style>
+    <script>
+        async function translateText() {
+            let text = document.getElementById("text").value;
+            let srcLang = document.getElementById("srcLang").value;
+            let destLang = document.getElementById("destLang").value;
+            
+            // Append source text message to chat box
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class="message"><div class="source-text">${text}</div><div class="translated-text"></div></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
+
+            let url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${srcLang}&tl=${destLang}&dt=t&q=${encodeURIComponent(text)}`;
+            
+            let response = await fetch(url);
+            let result = await response.json();
+            
+            // Get the translated message
+            let translatedText = result[0][0][0];
+            
+            // Insert translated text into the second div (right side)
+            const lastMessage = chatBox.lastElementChild;
+            lastMessage.querySelector(".translated-text").innerText = translatedText;
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Language Translation Tool </h2>
+        
+        <div class="chat-box" id="chat-box">
+            <!-- Messages will appear here -->
+        </div>
+        
+        <!-- Input Section -->
+        <label>Enter Text:</label>
+        <input type="text" id="text" placeholder="Type here...">
+        
+        <!-- Language Selection (Source and Destination) -->
+        <div style="display: flex; justify-content: space-between; gap: 10px;">
+            <div style="width: 48%;">
+                <label>From Language:</label>
+                <select id="srcLang">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                    <option value="mr">Marathi</option>
+                </select>
+            </div>
+            <div style="width: 48%;">
+                <label>To Language:</label>
+                <select id="destLang">
+                    <option value="hi">Hindi</option>
+                    <option value="en">English</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                    <option value="mr">Marathi</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Translate Button -->
+        <button onclick="translateText()">Translate</button>
+    </div>
+</body>
+</html>
